@@ -85,3 +85,20 @@ void display_gameover() {
     write(lcd_fd, buf, strlen(buf));
     close(lcd_fd);
 }
+
+void update_fnd(int remaining_sec, int score) {
+    int fnd_fd = open(FND_DEVICE, O_WRONLY);
+    if (fnd_fd < 0) {
+        perror("open fnd");
+        return;
+    }
+
+    unsigned char fnd_data[4];
+    fnd_data[0] = (remaining_sec / 10) % 10;
+    fnd_data[1] = remaining_sec % 10;
+    fnd_data[2] = (score / 10) % 10;
+    fnd_data[3] = score % 10;
+
+    write(fnd_fd, fnd_data, 4);
+    close(fnd_fd);
+}
