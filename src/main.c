@@ -46,3 +46,17 @@ void render_dot() {
     write(dot_fd, dot, sizeof(dot));
     close(dot_fd);
 }
+void play_buzzer() {
+    int buzzer_fd = open(BUZZER_DEVICE, O_WRONLY);
+    if (buzzer_fd < 0) {
+        perror("open buzzer");
+        return;
+    }
+
+    unsigned char on = 1;
+    write(buzzer_fd, &on, 1);
+    usleep(200000);
+    on = 0;
+    write(buzzer_fd, &on, 1);
+    close(buzzer_fd);
+}
