@@ -102,3 +102,40 @@ void update_fnd(int remaining_sec, int score) {
     write(fnd_fd, fnd_data, 4);
     close(fnd_fd);
 }
+
+void* note_thread(void* arg) {
+    srand(time(NULL));
+    int tick = 0;
+
+    while (game_running) {
+        pthread_mutex_lock(&lock);
+
+        for (int i = 0; i < MAX_NOTES; i++) {
+            if (notes[i].active) {
+                notes[i].row++;
+                if (notes[i].row >= DOT_ROWS) {
+                    notes[i].active = 0;
+                }
+            }
+        }
+
+        if (tick % 5 == 0) {
+            for (int i = 0; i < MAX_NOTES; i++) {
+                if (!notes[i].active) {
+                    notes[i].row = 0;
+                    notes[i].col = rand() % DOT_COLS;
+                    notes[i].active = 1;
+                    break;
+                }
+            }
+        }
+
+        render_dot();
+        pthread_mutex_unlock(&lock);
+
+        usleep(150000);  // 0.15초 대기
+        tick++;
+    }
+
+    return NULL;
+}
