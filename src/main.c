@@ -60,3 +60,28 @@ void play_buzzer() {
     write(buzzer_fd, &on, 1);
     close(buzzer_fd);
 }
+
+void update_textlcd_score(int score) {
+    int lcd_fd = open(TEXTLCD_DEVICE, O_WRONLY);
+    if (lcd_fd < 0) {
+        perror("open textlcd");
+        return;
+    }
+
+    char buf[32];
+    sprintf(buf, "Score: %d", score);
+    write(lcd_fd, buf, strlen(buf));
+    close(lcd_fd);
+}
+
+void display_gameover() {
+    int lcd_fd = open(TEXTLCD_DEVICE, O_WRONLY);
+    if (lcd_fd < 0) {
+        perror("open textlcd (game over)");
+        return;
+    }
+
+    char buf[32] = "   Game Over    ";
+    write(lcd_fd, buf, strlen(buf));
+    close(lcd_fd);
+}
