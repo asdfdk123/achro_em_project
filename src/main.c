@@ -170,3 +170,23 @@ void* input_thread(void* arg) {
 
     return NULL;
 }
+
+void* timer_thread(void* arg) {
+    while (game_running) {
+        int elapsed = time(NULL) - start_time;
+        int remaining = 30 - elapsed;
+
+        pthread_mutex_lock(&lock);
+        update_fnd(remaining, score);
+        pthread_mutex_unlock(&lock);
+
+        if (remaining <= 0) {
+            game_running = 0;
+            display_gameover();
+            break;
+        }
+
+        sleep(1);
+    }
+    return NULL;
+}
