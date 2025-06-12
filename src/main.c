@@ -139,3 +139,34 @@ void* note_thread(void* arg) {
 
     return NULL;
 }
+
+void* input_thread(void* arg) {
+    unsigned char btn[9];
+
+    while (game_running) {
+        int btn_fd = open(BUTTON_DEVICE, O_RDONLY);
+        if (btn_fd < 0) {
+            perror("open button");
+            usleep(100000);
+            continue;
+        }
+
+        read(btn_fd, &btn, sizeof(btn));
+        close(btn_fd);
+
+        pthread_mutex_lock(&lock);
+        for (int i = 0; i < MAX_NOTES; i++) {
+            if (notes[i].active && notes[i].row == DOT_ROWS - 1 && btn[notes[i].col] == 1) {
+                score++;
+                play_buzzer();
+                update_textlcd_score(score);
+                notes[i].active = 0;
+            }
+        }
+        pthread_mutex_unlock(&lock);
+
+        usleep(100000);  // 0.1초 대기
+    }
+
+    return NULL;
+}
