@@ -28,3 +28,21 @@ Note notes[MAX_NOTES];
 int score = 0;
 int game_running = 1;
 time_t start_time;
+
+void render_dot() {
+    int dot_fd = open(DOT_DEVICE, O_WRONLY);
+    if (dot_fd < 0) {
+        perror("open dot");
+        return;
+    }
+
+    unsigned char dot[DOT_ROWS] = {0};
+    for (int i = 0; i < MAX_NOTES; i++) {
+        if (notes[i].active && notes[i].row >= 0 && notes[i].row < DOT_ROWS && notes[i].col >= 0 && notes[i].col < DOT_COLS) {
+            dot[notes[i].row] |= (1 << (6 - notes[i].col));
+        }
+    }
+
+    write(dot_fd, dot, sizeof(dot));
+    close(dot_fd);
+}
