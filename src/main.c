@@ -269,5 +269,25 @@ int main() {
     printf(">> Opening ranking page...\n");
     sleep(1);
     system("chromium-browser --no-sandbox --disable-gpu --disable-software-rasterizer --kiosk http://localhost:5000");
+int main() {
+    pthread_t tid_note, tid_input, tid_timer;
+
+    pthread_mutex_init(&lock, NULL);
+    memset(notes, 0, sizeof(notes));
+    start_time = time(NULL);
+
+    update_textlcd_score(score);
+
+    pthread_create(&tid_note, NULL, note_thread, NULL);
+    pthread_create(&tid_input, NULL, input_thread, NULL);
+    pthread_create(&tid_timer, NULL, timer_thread, NULL);
+
+    pthread_join(tid_note, NULL);
+    pthread_join(tid_input, NULL);
+    pthread_join(tid_timer, NULL);
+
+    pthread_mutex_destroy(&lock);
+
+    printf("🎮 Game Over! Final Score: %d\n", score);
     return 0;
 }
